@@ -9,7 +9,7 @@ def cubic_frame_judgment():
                     for num in unconfirmed_numbers[sub_i][sub_j]:
                         indices[num-1] = (sub_i, sub_j) if not indices[num-1] else (9,9)
             for index in indices:
-                if index != (9,9) and index not in subscripts and index != ():
+                if index != (9,9) and index not in subscripts:
                     flag = True
                     nampre[index[0]][index[1]] = indices.index(index)+1
                     column_excluder(index[0], index[1], indices.index(index)+1)
@@ -27,7 +27,7 @@ def column_judgment():
             for num in unconfirmed_numbers[i][j]:
                 indices[num-1] = (i, j) if not indices[num-1] else (9,9)
         for index in indices:
-            if index != (9,9) and index not in subscripts and index != ():
+            if index != (9,9) and index not in subscripts:
                 flag = True
                 nampre[index[0]][index[1]] = indices.index(index)+1
                 column_excluder(index[0], index[1], indices.index(index)+1)
@@ -45,7 +45,7 @@ def row_judgment():
             for num in unconfirmed_numbers[i][j]:
                 indices[num-1] = (i, j) if not indices[num-1] else (9,9)
         for index in indices:
-            if index != (9,9) and index not in subscripts and index != ():
+            if index != (9,9) and index not in subscripts:
                 flag = True
                 nampre[index[0]][index[1]] = indices.index(index)+1
                 column_excluder(index[0], index[1], indices.index(index)+1)
@@ -171,14 +171,14 @@ def line_confirm():
 # 3次元配列同縦列から同じ数字を弾く
 def column_excluder(i, j, n):
     for sub_i in range(9):
-        if n in unconfirmed_numbers[sub_i][j] and len(unconfirmed_numbers[sub_i][j]) > 1:
+        if n in unconfirmed_numbers[sub_i][j]:
             unconfirmed_numbers[sub_i][j].remove(n)
     unconfirmed_numbers[i][j] = [n]
 
 # 3次元配列同横列から同じ数字を弾く
 def row_excluder(i, j, n):
     for sub_j in range(9):
-        if n in unconfirmed_numbers[i][sub_j] and len(unconfirmed_numbers[i][sub_j]) > 1:
+        if n in unconfirmed_numbers[i][sub_j]:
             unconfirmed_numbers[i][sub_j].remove(n)
     unconfirmed_numbers[i][j] = [n]
     
@@ -186,7 +186,7 @@ def row_excluder(i, j, n):
 def cubic_frame_excluder(i, j, n):
     for sub_i in range(i//3*3, i//3*3+3):
         for sub_j in range(j//3*3, j//3*3+3):
-            if n in unconfirmed_numbers[sub_i][sub_j] and len(unconfirmed_numbers[sub_i][sub_j]) > 1:
+            if n in unconfirmed_numbers[sub_i][sub_j]:
                 unconfirmed_numbers[sub_i][sub_j].remove(n)
     unconfirmed_numbers[i][j] = [n]
 
