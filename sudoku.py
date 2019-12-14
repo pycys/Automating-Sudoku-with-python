@@ -1,3 +1,5 @@
+import time, copy as cp
+
 # 3×3枠n確定判定&排除処理
 def cubic_frame_judgment():
     flag = False
@@ -15,7 +17,7 @@ def cubic_frame_judgment():
                     column_excluder(index[0], index[1], indices.index(index)+1)
                     row_excluder(index[0], index[1], indices.index(index)+1)
                     cubic_frame_excluder(index[0], index[1], indices.index(index)+1)
-                    subscripts.append((index[0], index[1]))
+                    subscripts.add((index[0], index[1]))
     return flag
 
 # 縦列n確定判定&排除処理
@@ -33,7 +35,7 @@ def column_judgment():
                 column_excluder(index[0], index[1], indices.index(index)+1)
                 row_excluder(index[0], index[1], indices.index(index)+1)
                 cubic_frame_excluder(index[0], index[1], indices.index(index)+1)
-                subscripts.append((index[0], index[1]))
+                subscripts.add((index[0], index[1]))
     return flag
 
 # 横列n確定判定&排除処理
@@ -51,7 +53,7 @@ def row_judgment():
                 column_excluder(index[0], index[1], indices.index(index)+1)
                 row_excluder(index[0], index[1], indices.index(index)+1)
                 cubic_frame_excluder(index[0], index[1], indices.index(index)+1)
-                subscripts.append((index[0], index[1]))
+                subscripts.add((index[0], index[1]))
     return flag
 
 # 置ける数字が１つしかないマスを探す&排除処理
@@ -66,7 +68,7 @@ def only_one_judgment():
                 column_excluder(i, j, num)
                 row_excluder(i, j, num)
                 cubic_frame_excluder(i, j, num)
-                subscripts.append((i,j))
+                subscripts.add((i,j))
     return flag
 
 # 例外処理１
@@ -86,7 +88,7 @@ def cubic_tumor_excluder():
                     for index in index_box:
                         if unconfirmed_numbers[index[0]][index[1]] != nums:
                             flag = True
-                            unconfirmed_numbers[index[0]][index[1]] = nums
+                            unconfirmed_numbers[index[0]][index[1]] = cp.deepcopy(nums)
     # 横列check
     for i in range(9):
         overlapping_numbers = [[] for i in range(9)]
@@ -99,7 +101,7 @@ def cubic_tumor_excluder():
                 for index in index_box:
                     if unconfirmed_numbers[index[0]][index[1]] != nums:
                         flag = True
-                        unconfirmed_numbers[index[0]][index[1]] = nums
+                        unconfirmed_numbers[index[0]][index[1]] = cp.deepcopy(nums)
     # 縦列check
     for j in range(9):
         overlapping_numbers = [[] for i in range(9)]
@@ -112,7 +114,54 @@ def cubic_tumor_excluder():
                 for index in index_box:
                     if unconfirmed_numbers[index[0]][index[1]] != nums:
                         flag = True
-                        unconfirmed_numbers[index[0]][index[1]] = nums
+                        unconfirmed_numbers[index[0]][index[1]] = cp.deepcopy(nums)
+    return flag
+
+# 例外1の逆バージョン
+def remainder_excluder():
+    flag = False
+    # 3×3枠
+    for i in range(3):
+        for j in range(3):
+            cubic_frame_nums = []
+            for sub_i in range(i*3, i*3+3):
+                for sub_j in range(j*3, j*3+3):
+                    cubic_frame_nums.append(cp.deepcopy(unconfirmed_numbers[sub_i][sub_j]))
+            for nums in cubic_frame_nums:
+                if len(nums) == cubic_frame_nums.count(nums) > 1:
+                    for sub_i in range(i*3, i*3+3):
+                        for sub_j in range(j*3, j*3+3):
+                            if unconfirmed_numbers[sub_i][sub_j] != nums:
+                                for num in nums:
+                                    if num in unconfirmed_numbers[sub_i][sub_j]:
+                                        unconfirmed_numbers[sub_i][sub_j].remove(num)
+                                        flag = True
+    # 横
+    for i in range(9):
+        row_line_nums = []
+        for j in range(9):
+            row_line_nums.append(cp.deepcopy(unconfirmed_numbers[i][j]))
+        for nums in row_line_nums:
+            if len(nums) == row_line_nums.count(nums) > 1:
+                for j in range(9):
+                    if unconfirmed_numbers[i][j] != nums:
+                        for num in nums:
+                            if num in unconfirmed_numbers[i][j]:
+                                unconfirmed_numbers[i][j].remove(num)
+                                flag = True
+    # 縦
+    for j in range(9):
+        column_line_nums = []
+        for i in range(9):
+            column_line_nums.append(cp.deepcopy(unconfirmed_numbers[i][j]))
+        for nums in column_line_nums:
+            if len(nums) == column_line_nums.count(nums) > 1:
+                for i in range(9):
+                    if unconfirmed_numbers[i][j] != nums:
+                        for num in nums:
+                            if num in unconfirmed_numbers[i][j]:
+                                unconfirmed_numbers[i][j].remove(num)
+                                flag = True
     return flag
 
 # 例外処理２
@@ -170,23 +219,29 @@ def line_confirm():
 
 # 3次元配列同縦列から同じ数字を弾く
 def column_excluder(i, j, n):
+    flag = False
     for sub_i in range(9):
         if n in unconfirmed_numbers[sub_i][j]:
             unconfirmed_numbers[sub_i][j].remove(n)
+            flag = True
     unconfirmed_numbers[i][j] = [n]
 
 # 3次元配列同横列から同じ数字を弾く
 def row_excluder(i, j, n):
+    flag = False
     for sub_j in range(9):
         if n in unconfirmed_numbers[i][sub_j]:
             unconfirmed_numbers[i][sub_j].remove(n)
+            flag = True
     unconfirmed_numbers[i][j] = [n]
-    
+
 # 3次元配列同枠内から同じ数字を弾く
 def cubic_frame_excluder(i, j, n):
+    flag = False
     for sub_i in range(i//3*3, i//3*3+3):
         for sub_j in range(j//3*3, j//3*3+3):
             if n in unconfirmed_numbers[sub_i][sub_j]:
+                flag = True
                 unconfirmed_numbers[sub_i][sub_j].remove(n)
     unconfirmed_numbers[i][j] = [n]
 
@@ -197,7 +252,7 @@ def nampre_print():
         if index == 8:
             print("|", end="")
             [print(" "+str(n)+" |",end="") for i, n in enumerate(nums)]
-            print("\n ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣")
+            print("\n ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣")
         elif (index+1)%3 == 0:
             print("|", end="")
             [print(" "+str(n)+" |",end="") for i, n in enumerate(nums)]
@@ -208,11 +263,14 @@ def nampre_print():
             print("\n|---|---|---|---|---|---|---|---|---|")
 
 
+# 時間を測る
+start = time.time()
+
 # 入力＆2次元配列に整形
 nums = [int(i) for i in input().split()]
 nampre = [[] for i in range(9)]
 for index, i in enumerate(nums):
-    nampre[(index)//9].append(i)
+    nampre[index//9].append(i)
 
 # 未確定数字参照用の3次元配列生成
 unconfirmed_numbers = [[[n for n in range(1,10)] for j in range(9)] for i in range(9)]
@@ -221,7 +279,7 @@ unconfirmed_numbers = [[[n for n in range(1,10)] for j in range(9)] for i in ran
 flag = False
 
 # 数字確定済添字
-subscripts = []
+subscripts = set()
 
 # 3次元配列削る
 for i in range(9):
@@ -232,9 +290,10 @@ for i in range(9):
             column_excluder(i, j, num)
             row_excluder(i, j, num)
             cubic_frame_excluder(i, j, num)
-            subscripts.append((i,j))
+            subscripts.add((i,j))
 
 nampre_print()
 while flag:
-    flag = cubic_frame_judgment() or row_judgment() or column_judgment() or only_one_judgment() or cubic_tumor_excluder() or line_confirm()
+    flag = cubic_frame_judgment() or row_judgment() or column_judgment() or only_one_judgment() or cubic_tumor_excluder() or remainder_excluder() or line_confirm()
 nampre_print()
+print(str(time.time()-start)+"[sec]")
